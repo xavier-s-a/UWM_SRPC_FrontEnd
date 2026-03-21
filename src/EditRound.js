@@ -1,0 +1,337 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Spinner from 'react-bootstrap/Spinner'; // <-- Import Spinner from react-bootstrap
+import './index.css';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import CountdownTimer from './CountdownTimer';
+import Toast from 'react-bootstrap/Toast';
+
+function EditRound({ round }) {
+  const { posterId } = useParams();
+  const [posterIdRound] = useState(posterId);
+  const [posterTitle, setPosterTitle] = useState("");
+  const [studentName, setStudentName] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+  const [studentDepartment, setStudentDepartment] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [researchScore, setResearchScore] = useState("");
+  const [communicationScore, setCommunicationScore] = useState("");
+  const [presentationScore, setPresentationScore] = useState("");
+  const [feedback, setFeedback] = useState("");
+
+
+  useEffect(() => {
+    document.title = `Edit Poster Score`;
+  }, [round]);
+
+  useEffect(() => {
+    let ignore = false;
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/insertgrade/round${round}_edit/${posterId}`, 
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (!ignore && response.status === 200) {
+          const data = await response.json();
+          setPosterTitle(data.poster_title);
+          setStudentName(data.student_name);
+          setStudentEmail(data.student_email);
+          setStudentDepartment(data.student_department);
+          setResearchScore( data.research_score === 0 && !data.feedback ? "" : data.research_score);
+          setCommunicationScore(data.communication_score === 0 && !data.feedback ? "" : data.communication_score);
+          setPresentationScore(data.presentation_score === 0 && !data.feedback ? "" : data.presentation_score);
+          setFeedback(data.feedback);
+        }
+      } catch (error) {
+        console.error("Error fetching poster data:", error);
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+    return () => {
+      ignore = true;
+    };
+  }, [posterIdRound, round]);
+
+  // Show a spinner if still loading
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+        <p className="mt-3">Fetching Poster Data...</p>
+      </div>
+    );
+  }
+
+  const updateOrFirstTimeScoring =
+    researchScore === 0 &&
+    communicationScore === 0 &&
+    presentationScore === 0 &&
+    feedback === "";
+
+  return (
+    <>
+      <CountdownTimer targetDate={new Date("2023-04-22T09:00:00-05:00")} />
+      <div className="bg-gradient-to-r from-ffbd00 to-[#eca600] min-h-screen py-6">
+        <div className="container mx-auto max-w-3xl px-4">
+          <div className="bg-white shadow-md rounded-lg p-8 mb-6">
+            <h1 className="text-3xl font-bold text-center mb-4">
+              {updateOrFirstTimeScoring ? "Enter" : "Edit"} Poster Score
+            </h1>
+            <p className="text-gray-700 mb-2">
+              <strong>Poster ID:</strong> {posterIdRound}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <strong>Poster Title:</strong> {posterTitle}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <strong>Student Name:</strong> {studentName}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <strong>Student Department:</strong> {studentDepartment}
+            </p>
+            <a href="/judge/research-poster">
+            <button className="mt-4 bg-black hover:bg-yellow-600 text-yellow-400 font-bold py-2 px-4 rounded border border-yellow-400">
+            &lt;&lt; Go back
+              </button>
+            </a>
+          </div>
+
+          <Scoringfields
+            posterIdRound={posterIdRound}
+            researchScore={researchScore}
+            communicationScore={communicationScore}
+            presentationScore={presentationScore}
+            feedback={feedback}
+            setResearchScore={setResearchScore}
+            setCommunicationScore={setCommunicationScore}
+            setPresentationScore={setPresentationScore}
+            setFeedback={setFeedback}
+            round={round}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function Scoringfields({
+  posterIdRound,
+  researchScore,
+  communicationScore,
+  presentationScore,
+  feedback,
+  setResearchScore,
+  setCommunicationScore,
+  setPresentationScore,
+  setFeedback,
+  round,
+}) {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [researchError, setResearchError] = useState("");
+  const [communicationError, setCommunicationError] = useState("");
+  const [presentationError, setPresentationError] = useState("");
+  const navigate = useNavigate();
+
+  const handleFormsubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+    let hasError = false;
+    setResearchError("");
+    setCommunicationError("");
+    setPresentationError("");
+
+      if (researchScore === "") {
+        setResearchError("Research score is required.");
+        hasError = true;
+      }
+      if (communicationScore === "") {
+        setCommunicationError("Communication score is required.");
+        hasError = true;
+      }
+      if (presentationScore === "") {
+        setPresentationError("Presentation score is required.");
+        hasError = true;
+      }
+
+      // range check
+      if (Number(researchScore) < 0 || Number(researchScore) > 50) {
+        setResearchError("Must be between 0–50.");
+        hasError = true;
+      }
+      if (Number(communicationScore) < 0 || Number(communicationScore) > 30) {
+        setCommunicationError("Must be between 0–30.");
+        hasError = true;
+      }
+      if (Number(presentationScore) < 0 || Number(presentationScore) > 20) {
+        setPresentationError("Must be between 0–20.");
+        hasError = true;
+      }
+
+      if (hasError) {
+        setLoading(false);
+        return;
+      }
+
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/insertgrade/round${round}_edit/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          poster_id: posterIdRound,
+          research_score: Number(researchScore),
+          communication_score: Number(communicationScore),
+          presentation_score: Number(presentationScore),
+          feedback: feedback,
+        }),
+      }
+    );
+
+    if (response.status === 200) {
+      setLoading(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      navigate("/judge/research-poster");
+    } else {
+      const data = await response.json();
+      setError(data.error);
+      setLoading(false);
+    }
+  };
+  
+  const handleDecimalChange = (setter) => (e) => {
+  let value = e.target.value;
+
+  value = value.replace(/[^0-9.]/g, "");
+
+  const parts = value.split(".");
+  if (parts.length > 2) {
+    value = parts[0] + "." + parts.slice(1).join("");
+  }
+
+  if (value.includes(".")) {
+    const [whole, decimal] = value.split(".");
+    value = `${whole}.${decimal.slice(0, 2)}`;
+  }
+
+  setter(value);
+};
+  return (
+    <>
+      <div className="bg-white shadow-md rounded-lg p-8 mb-6">
+        <form onSubmit={handleFormsubmit}>
+          <div className="mb-4">
+            <label htmlFor="researchScore" className="block text-gray-700 font-bold mb-2">
+              Research Score (0-50)
+            </label>
+            <input
+              type="text"
+              inputMode="decimal"
+              pattern="^\d*\.?\d{0,2}$"
+              className="w-full border px-3 py-2 rounded"
+              id="researchScore"
+              value={researchScore}
+              onChange={handleDecimalChange(setResearchScore)}
+              onWheel={(e) => e.target.blur()}
+            />{researchError && <p className="text-red-500 text-sm">{researchError}</p>}
+          </div>
+          <div className="mb-4">
+            <label htmlFor="communicationScore" className="block text-gray-700 font-bold mb-2">
+              Communication Score (0-30)
+            </label>
+            <input
+              type="text"
+              inputMode="decimal"
+              pattern="^\d*\.?\d{0,2}$"
+              className="w-full border px-3 py-2 rounded"
+              id="communicationScore"
+              value={communicationScore}
+              onChange={handleDecimalChange(setCommunicationScore)}
+              onWheel={(e) => e.target.blur()}
+            /> {communicationError && <p className="text-red-500 text-sm">{communicationError}</p>}
+          </div>
+          <div className="mb-4">
+            <label htmlFor="presentationScore" className="block text-gray-700 font-bold mb-2">
+              Presentation Score (0-20)
+            </label>
+            <input
+              type="text"
+              inputMode="decimal"
+              pattern="^\d*\.?\d{0,2}$"
+              className="w-full border px-3 py-2 rounded"
+              id="presentationScore"
+              value={presentationScore}
+              onChange={handleDecimalChange(setPresentationScore)}
+              onWheel={(e) => e.target.blur()}
+            />{presentationError && <p className="text-red-500 text-sm">{presentationError}</p>}
+          </div>
+          <div className="mb-4">
+            <label htmlFor="feedback" className="block text-gray-700 font-bold mb-2">
+              Feedback
+            </label>
+            <textarea
+              className="w-full border px-3 py-2 rounded"
+              id="feedback"
+              rows={4}
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+            />
+          </div>
+          <p className="text-red-500 text-sm italic mb-4">{error}</p>
+          <button
+            type="submit"
+            className="w-full bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded"
+            // className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            {loading ? "Submitting..." : "Submit Scores"}
+          </button>
+        </form>
+      </div>
+
+      <Toast
+        onClose={() => setShowSuccess(false)}
+        show={showSuccess}
+        delay={3000}
+        autohide
+        style={{
+          position: "fixed",
+          top: "20px",
+          right: "30px",
+          minWidth: "250px",
+          backgroundColor: "#d1fae5",
+          border: "1px solid #10b981",
+          color: "#065f46",
+          zIndex: 9999,
+        }}
+      >
+        <Toast.Body>
+          <strong>Success:</strong> Scores submitted successfully!
+        </Toast.Body>
+      </Toast>
+    </>
+  );
+}
+
+export default EditRound;
