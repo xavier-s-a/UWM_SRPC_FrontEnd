@@ -709,10 +709,19 @@ export default function AdminDashboardPanel() {
     })
     .then((res) => {
       setData(res.data);
+      setAggStatus((prev) => ({
+        ...prev,
+        lastRun: new Date().toLocaleString(),
+        error: "",
+      }));
     })
     .catch(() => {
-      setData([]);
-    });
+    setData([]);
+    setAggStatus((prev) => ({
+      ...prev,
+      lastRun: new Date().toLocaleString(),
+    }));
+  });
 }, [API_URL, category, token]);
 
  
@@ -734,10 +743,19 @@ const fetchData = useCallback(() => {
     })
     .then((res) => {
       setData(res.data);
+      setAggStatus((prev) => ({
+        ...prev,
+        lastRun: new Date().toLocaleString(),
+        error: "",
+      }));
     })
     .catch(() => {
-      setData([]);
-    });
+    setData([]);
+    setAggStatus((prev) => ({
+      ...prev,
+      lastRun: new Date().toLocaleString(),
+    }));
+  });
 }, [API_URL, category, token, view, fetchJudgeProgress]);
 
   const exportToExcel = async () => {
@@ -1097,7 +1115,7 @@ const fetchAggregateData = useCallback(() => {
           ...inset(theme, 16),
           color: theme.text,
           background: `linear-gradient(145deg, ${theme.inputBg}, ${theme.panel2})`,
-          ["--tw-ring-color"]: theme.ring,
+          "--tw-ring-color": theme.ring,
           minHeight: 58,
         }}
       >
@@ -1130,7 +1148,7 @@ const fetchAggregateData = useCallback(() => {
           ...inset(theme, 16),
           color: theme.text,
           background: `linear-gradient(145deg, ${theme.inputBg}, ${theme.panel2})`,
-          ["--tw-ring-color"]: theme.ring,
+          "--tw-ring-color": theme.ring,
           minHeight: 58,
         }}
       >
