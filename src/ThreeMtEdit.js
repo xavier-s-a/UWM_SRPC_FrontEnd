@@ -301,7 +301,10 @@ function ThreeMTEdit() {
 
 function FormInput({ label, value, onChange, error }) {
   const handleChange = (e) => {
-    onChange(e.target.value); // store raw string
+    const val = onChange(e.target.value); // store raw string
+    if (val=== ""||/^[0-9]+$/.test(val)) {
+    onChange(val);
+  }
   };
   const handleWheel = (e) => {
     e.target.blur(); 
@@ -311,8 +314,8 @@ function FormInput({ label, value, onChange, error }) {
       <label className="block text-gray-700 font-bold mb-1">{label}</label>
       <input
         type="number"
-        step="any"
-        inputMode="decimal"
+        step="1"
+        inputMode="numeric"
         pattern="[0-9]*"
         onWheel={handleWheel}
         className="w-full border rounded px-3 py-2"

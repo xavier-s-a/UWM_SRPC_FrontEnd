@@ -190,7 +190,9 @@ function Scoringfields({
         setLoading(false);
         return;
       }
-
+const researchVal = parseInt(researchScore, 10);
+const communicationVal = parseInt(communicationScore, 10);
+const presentationVal = parseInt(presentationScore, 10);
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/insertgrade/round${round}_edit/`,
       {
@@ -199,11 +201,12 @@ function Scoringfields({
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        
         body: JSON.stringify({
           poster_id: posterIdRound,
-          research_score: Number(researchScore),
-          communication_score: Number(communicationScore),
-          presentation_score: Number(presentationScore),
+          research_score: researchVal,
+          communication_score: communicationVal,
+          presentation_score: presentationVal,
           feedback: feedback,
         }),
       }
@@ -222,21 +225,13 @@ function Scoringfields({
   };
   
   const handleDecimalChange = (setter) => (e) => {
-  let value = e.target.value;
+  const value = e.target.value;
 
-  value = value.replace(/[^0-9.]/g, "");
+  // value = value.replace(/[^0-9.]/g, "");
 
-  const parts = value.split(".");
-  if (parts.length > 2) {
-    value = parts[0] + "." + parts.slice(1).join("");
+  if ( value === ""||/^\d+$/.test(value)) {
+    setter(value);
   }
-
-  if (value.includes(".")) {
-    const [whole, decimal] = value.split(".");
-    value = `${whole}.${decimal.slice(0, 2)}`;
-  }
-
-  setter(value);
 };
   return (
     <>
@@ -248,8 +243,8 @@ function Scoringfields({
             </label>
             <input
               type="text"
-              inputMode="decimal"
-              pattern="^\d*\.?\d{0,2}$"
+              inputMode="numeric"
+              pattern="[0-9]*"
               className="w-full border px-3 py-2 rounded"
               id="researchScore"
               value={researchScore}
@@ -263,8 +258,8 @@ function Scoringfields({
             </label>
             <input
               type="text"
-              inputMode="decimal"
-              pattern="^\d*\.?\d{0,2}$"
+              inputMode="numeric"
+              pattern="[0-9]*"
               className="w-full border px-3 py-2 rounded"
               id="communicationScore"
               value={communicationScore}
@@ -278,8 +273,8 @@ function Scoringfields({
             </label>
             <input
               type="text"
-              inputMode="decimal"
-              pattern="^\d*\.?\d{0,2}$"
+              inputMode="numeric"
+              pattern="[0-9]*"
               className="w-full border px-3 py-2 rounded"
               id="presentationScore"
               value={presentationScore}
