@@ -1473,7 +1473,7 @@ const fetchAggregateData = useCallback(() => {
     className="text-center text-sm sm:text-base font-black tracking-wide"
     style={{ color: theme.muted }}
   >
-    UWM SRPC Dashboard - 2026
+    UWM SRPC Dashboard
   </div>
 </footer>
       </div>
