@@ -1750,7 +1750,7 @@ const handleCalculateAggregate = useCallback(async () => {
     className="text-center text-sm sm:text-base font-black tracking-wide"
     style={{ color: theme.muted }}
   >
-    UWM SRPC Dashboard
+    UWM RPC Dashboard
   </div>
 </footer>
       </div>
