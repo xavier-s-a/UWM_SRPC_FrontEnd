@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import './index.css';
 import 'tailwindcss/tailwind.css';
 import CountdownTimer from './CountdownTimer';
 
 
 function Login() {
-  useState(() => {
+  useEffect(() => {
     document.title = "Login";
   }, []);
 
@@ -30,14 +30,16 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     // Add code to handle login submission
+    
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const response = await fetch(`${process.env.REACT_APP_API_URL}/signin/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email,
+          email: normalizedEmail,
           password,
         }),
       });
@@ -58,14 +60,18 @@ function Login() {
       }
     }
     catch (error) {
-      console.log(error);
+        console.log(error);
+        const p = document.getElementById("error");
+        p.innerHTML = "Login failed. Please check your connection and try again.";
+        p.style.color = "red";
+        setLoading(false);
     }
   };
 
   return (
     <>
       <CountdownTimer targetDate={new Date('2026-04-25T09:00:00-05:00')} />
-      <div className="min-h-screen bg-gradient-to-r from-ffbd00 to-[#eca600] flex items-center justify-center lg:-mt-16">
+      <div className="min-h-screen bg-gradient-to-r from-ffbd00 to-[#eca600] flex items-center justify-center p-4 ">
         <div className="bg-white shadow-md rounded-lg p-8 w-full md:w-96 lg:w-1/2 mx-4 md:mx-0">
           <form onSubmit={handleSubmit} className="space-y-6">
             <h1 className="text-4xl font-bold text-center">Judge Login</h1>
@@ -80,6 +86,11 @@ function Login() {
                 type="email"
                 className="w-full p-2 border border-gray-300 rounded"
                 id="email"
+                inputMode="email"
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 aria-describedby="Email"
                 placeholder="Enter your email"
                 value={email}
@@ -96,6 +107,7 @@ function Login() {
                 type={showPassword ? 'text' : 'password'}
                 className="w-full p-2 border border-gray-300 rounded"
                 id="password"
+                autoComplete="current-password"
                 aria-describedby="Password"
                 placeholder="Enter your password"
                 value={password}

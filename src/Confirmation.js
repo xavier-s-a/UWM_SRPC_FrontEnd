@@ -23,7 +23,7 @@ function Confirmation() {
                         <br />
 
                         <h3 className="text-xl font-semibold my-4">
-                            Student Research Poster Competition
+                            Poster Competition & Three Minute Thesis
                         </h3>
 
                         <p className="text-xl mb-4">

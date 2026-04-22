@@ -90,11 +90,16 @@ function RubricModel({ show, handleClose, rubricType }) {
         return <p>No rubric available.</p>;
     }
   };
-
+  const rubricTitle =
+  rubricType === "poster"
+    ? "Scoring Rubric for Research Poster"
+    : rubricType === "explearning"
+    ? "Scoring Rubric for Experiential Learning"
+    : "Scoring Rubric for Three Minute Thesis";
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Scoring Rubric</Modal.Title>
+        <Modal.Title>{rubricTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>{getRubricContent()}</Modal.Body>
       <Modal.Footer>

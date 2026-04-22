@@ -105,7 +105,7 @@ function JudgeInfo({ judge }) {
         <div>
           <p className="mb-4">
           <strong>
-    Thank you for being a judge today! Click "Begin Judging" to enter each poster's scores. You can edit your scores later if necessary. Check "Rubric" in
+    Thank you for being a judge today! Click "Begin Judging" to enter each poster's scores. You can edit your scores later if necessary. Check "Scoring Rubric" in
     the top menu for scoring guidelines.
   </strong>
           </p>

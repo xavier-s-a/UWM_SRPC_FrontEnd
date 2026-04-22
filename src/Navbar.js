@@ -80,13 +80,13 @@ function NavigationBar() {
                 <Nav.Link href="/judge/exp-learning">Experiential Learning Poster</Nav.Link>
                 <Nav.Link href="/judge/three-mt">Three Minute Thesis</Nav.Link>
                 {showRubricTab && (
-                  <Nav.Link onClick={handleShowRubric}>Rubric</Nav.Link>
+                  <Nav.Link onClick={handleShowRubric}>Scoring Rubric</Nav.Link>
                 )}
                 <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
               </Nav>
             ) : (
               <Nav className="me-auto">
-                <Nav.Link href="/">Student Research Poster Competition </Nav.Link>
+                <Nav.Link href="/">Poster Competition & Three Minute Thesis</Nav.Link>
                 <Nav.Link href="/">Home</Nav.Link>
                 <Nav.Link href="/login">Login</Nav.Link>
                 <Nav.Link href="/signup">Register</Nav.Link>

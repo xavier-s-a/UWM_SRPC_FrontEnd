@@ -106,6 +106,7 @@ const FILTER_PLACEHOLDERS = {
   scored_by: "Filter by scored progress (e.g. 1/4)",
   poster_ids: "Filter by poster IDs",
   student: "Filter by student name",
+  department: "Filter by department",
 };
 
 const normalizeFilterValue = (key, value) => {
@@ -130,6 +131,7 @@ const SORT_OPTIONS = {
   student: [
     { value: "student", label: "Student Name" },
     { value: "poster_id", label: "Poster ID" },
+    { value: "department", label: "Department" },
     { value: "scored_by", label: "Scored Progress" },
   ],
 };
@@ -432,10 +434,51 @@ function FilterInput({ value, onChange, placeholder, theme, ariaLabel, inputMode
 //     </select>
 //   );
 // }
+ const getStudentStatusColors = (theme, statusColor) => {
+  if (statusColor === "red") {
+    return {
+      bg: theme.mode === "light" ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.16)",
+      border: theme.mode === "light" ? "#e57373" : "#ef4444",
+      text: theme.mode === "light" ? "#c2410c" : "#ff8a80",
+    };
+  }
+  if (statusColor === "yellow") {
+    return {
+      bg: theme.mode === "light" ? "rgba(255,189,0,0.12)" : "rgba(255,189,0,0.18)",
+      border: theme.mode === "light" ? "#d69a00" : "#ffbd00",
+      text: theme.mode === "light" ? "#9a6700" : "#ffd666",
+    };
+  }
+  return {
+    bg: theme.mode === "light" ? "rgba(34,197,94,0.10)" : "rgba(34,197,94,0.16)",
+    border: theme.mode === "light" ? "#22a06b" : "#22c55e",
+    text: theme.mode === "light" ? "#1f7a38" : "#8ce99a",
+  };
+};
+
 
 function MobileRowCard({ view, item, theme }) {
+       const statusUi =view === "student"
+    ? getStudentStatusColors(theme, item.status_color)
+    : view === "scores"
+    ? getJudgeCountColors(theme, Number(item.judge_count || 0))
+    : null;
+
   return (
-    <article style={{ ...raised(theme, 20), padding: 16 }}>
+    // <article style={{ ...raised(theme, 20), padding: 16 }}>
+    
+  <article
+      style={{
+        ...raised(theme, 20),
+        padding: 16,
+        ...(view === "student"
+          ? {
+              background: statusUi.bg,
+              border: `2px solid ${statusUi.border}`,
+            }
+          : {}),
+      }}
+    >
       {view === "scores" && (
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2 text-lg font-black" style={{ color: theme.text }}>
@@ -453,6 +496,12 @@ function MobileRowCard({ view, item, theme }) {
             </div>
             <div style={{ color: theme.text }}>{item.judge_count}</div>
           </div>
+          <div className="col-span-2">
+          <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+            Department
+          </div>
+          <div style={{ color: theme.text }}>{item.department || "—"}</div>
+        </div>
           <div className="col-span-2">
             <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
               Average Score
@@ -495,30 +544,57 @@ function MobileRowCard({ view, item, theme }) {
           </div>
         </div>
       )}
-
-      {view === "student" && (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="col-span-2 text-lg font-black" style={{ color: theme.text }}>
-            {item.student}
-          </div>
-          <div>
-            <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
-              Poster ID
-            </div>
-            <div style={{ color: theme.text }}>{item.poster_id}</div>
-          </div>
-          <div>
-            <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
-              Scored Progress
-            </div>
-            <div style={{ color: theme.text }}>{item.scored_by}</div>
-          </div>
-        </div>
+      {
+      view === "student" && (
+        
+     <div className="grid grid-cols-2 gap-3">
+    <div className="col-span-2 text-lg font-black" style={{ color: theme.text }}>
+      {item.student}
+    </div>
+    <div>
+      <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+        Poster ID
+      </div>
+      <div style={{ color: theme.text }}>{item.poster_id}</div>
+    </div>
+    <div>
+      <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+        Scored Progress
+      </div>
+      <div style={{ color: statusUi.text, fontWeight: 800 }}>{item.scored_by}</div>
+    </div>
+    <div className="col-span-2">
+      <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+        Department
+      </div>
+      <div style={{ color: theme.text }}>{item.department || "—"}</div>
+    </div>
+  </div>
       )}
     </article>
   );
 }
-
+const getJudgeCountColors = (theme, judgeCount) => {
+  if (judgeCount === 0) {
+    return {
+      bg: theme.mode === "light" ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.16)",
+      border: theme.mode === "light" ? "#e57373" : "#ef4444",
+      text: theme.mode === "light" ? "#c2410c" : "#ff8a80",
+    };
+  }
+  if (judgeCount === 1 || judgeCount === 2) {
+    return {
+      bg: theme.mode === "light" ? "rgba(255,189,0,0.12)" : "rgba(255,189,0,0.18)",
+      border: theme.mode === "light" ? "#d69a00" : "#ffbd00",
+      text: theme.mode === "light" ? "#9a6700" : "#ffd666",
+    };
+  }
+  return {
+    bg: theme.mode === "light" ? "rgba(34,197,94,0.10)" : "rgba(34,197,94,0.16)",
+    border: theme.mode === "light" ? "#22a06b" : "#22c55e",
+    text: theme.mode === "light" ? "#1f7a38" : "#8ce99a",
+  };
+};
 function AggregateTable({ students, theme }) {
   return (
     <>
@@ -526,7 +602,7 @@ function AggregateTable({ students, theme }) {
         <table className="w-full text-sm" aria-label="Aggregate ranking table">
           <thead>
             <tr>
-              {["Name", "Poster ID", "Department", "Advisor", "Title", "Category", "Average Score"].map((head) => (
+              {["Name", "Poster ID", "Department", "Advisor", "Title", "Judge Count", "Average Score"].map((head) => (
                 <th
                   key={head}
                   scope="col"
@@ -539,27 +615,50 @@ function AggregateTable({ students, theme }) {
             </tr>
           </thead>
           <tbody>
-            {students.map((student, idx) => (
-              <tr key={idx}>
-                <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{student.name}</td>
-                <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{student.poster_id}</td>
-                <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{student.department}</td>
-                <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{student.advisor}</td>
-                <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{student.title}</td>
-                <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>
-                  {student.poster_id >= 101 && student.poster_id <= 199 ? "UG" : "Grad"}
-                </td>
-                <td className="px-4 py-4 font-black" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>
-                  {student.avg_score}
-                </td>
-              </tr>
-            ))}
+            {students.map((student, idx) => {
+              const rowUi = getJudgeCountColors(theme, Number(student.judge_count || 0));
+              return (
+                <tr key={idx}>
+                  <td
+                    className="px-4 py-4"
+                    style={{
+                      color: theme.text,
+                      borderBottom: `1px solid ${theme.border}`,
+                      background: rowUi.bg,
+                      borderLeft: `4px solid ${rowUi.border}`,
+                    }}
+                  >
+                    {student.name}
+                  </td>
+                  <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}`, background: rowUi.bg }}>
+                    {student.poster_id}
+                  </td>
+                  <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}`, background: rowUi.bg }}>
+                    {student.department}
+                  </td>
+                  <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}`, background: rowUi.bg }}>
+                    {student.advisor}
+                  </td>
+                  <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}`, background: rowUi.bg }}>
+                    {student.title}
+                  </td>
+                  <td className="px-4 py-4 font-black" style={{ color: rowUi.text, borderBottom: `1px solid ${theme.border}`, background: rowUi.bg }}>
+                    {student.judge_count}
+                  </td>
+                  <td className="px-4 py-4 font-black" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}`, background: rowUi.bg }}>
+                    {student.avg_score}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:hidden">
-        {students.map((student, idx) => (
+        {students.map((student, idx) => {
+          const rowUi = getJudgeCountColors(theme, Number(student.judge_count || 0));
+          return (
           <article key={idx} style={{ ...raised(theme, 20), padding: 16 }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -585,14 +684,20 @@ function AggregateTable({ students, theme }) {
                 </div>
                 <div style={{ color: theme.text }}>{student.poster_id}</div>
               </div>
-              <div>
+              {/* <div>
                 <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
                   Category
                 </div>
                 <div style={{ color: theme.text }}>
                   {student.poster_id >= 101 && student.poster_id <= 199 ? "UG" : "Grad"}
                 </div>
+              </div> */}
+              <div>
+              <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+                Judge Count
               </div>
+              <div style={{ color: "#22c55e", fontWeight: 800 }}>{student.judge_count}</div>
+            </div>
               <div>
                 <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
                   Department
@@ -607,7 +712,7 @@ function AggregateTable({ students, theme }) {
               </div>
             </div>
           </article>
-        ))}
+        )})}
       </div>
     </>
   );
@@ -801,6 +906,7 @@ const fetchAggregateData = useCallback(() => {
           department: student.department || "Unknown",
           advisor: student.advisor || "Unknown",
           title: student.title || "Unknown",
+          judge_count: student.judges_count ?? 0,
           category:
             Number(student.poster_id) >= 101 && Number(student.poster_id) <= 199 ? "UG" : "Grad",
           avg_score: avgScore,
@@ -846,6 +952,45 @@ const fetchAggregateData = useCallback(() => {
     });
 }, [API_URL, category, token]);
 
+const runAggregateCalculation = useCallback(async () => {
+  if (!token) return;
+
+  const headers = { Authorization: `Bearer ${token}` };
+
+  if (category === "respost") {
+    await axios.get(`${API_URL}/home/populate_round_1_table/`, { headers });
+    return;
+  }
+
+  if (category === "exp") {
+    await axios.post(`${API_URL}/explearning/aggregate/`, {}, { headers });
+    return;
+  }
+
+  if (category === "3mt") {
+    await axios.post(`${API_URL}/three-mt/aggregate/`, {}, { headers });
+    return;
+  }
+}, [API_URL, category, token]);
+const handleCalculateAggregate = useCallback(async () => {
+  setAggStatus({ loading: true, error: "", lastRun: "" });
+
+  try {
+    await runAggregateCalculation();
+    await Promise.all([fetchAggregateData(), fetchData()]);
+    setAggStatus({
+      loading: false,
+      error: "",
+      lastRun: new Date().toLocaleString(),
+    });
+  } catch (error) {
+    setAggStatus({
+      loading: false,
+      error: "Aggregate calculation failed",
+      lastRun: "",
+    });
+  }
+}, [runAggregateCalculation, fetchAggregateData, fetchData]);
   const rows = useMemo(() => {
   if (view === "judge") {
     return data.map((x) => ({
@@ -855,8 +1000,16 @@ const fetchAggregateData = useCallback(() => {
         x.posters_scored_count ?? (Array.isArray(x.posters_scored) ? x.posters_scored.length : 0),
       // total_posters: x.total_posters ?? x.total_scored ?? 0,
       poster_ids:
+      Array.isArray(x.posters_scored) && x.posters_scored.length > 0
+        ? x.posters_scored
+            .map((p) => `${p.poster_id} (${p.department || "No Dept"})`)
+            .join(", ")
+        : "No posters scored yet",
+        poster_details:
         Array.isArray(x.posters_scored) && x.posters_scored.length > 0
-          ? x.posters_scored.join(", ")
+          ? x.posters_scored
+              .map((p) => `${p.poster_id} - ${p.student_name} - ${p.department || "No Dept"}`)
+              .join(" | ")
           : "No posters scored yet",
     }));
   }
@@ -865,22 +1018,27 @@ const fetchAggregateData = useCallback(() => {
     return data.map((x) => ({
       student_name: x.student__Name ?? x.Student__Name ?? "",
       poster_id: x.student__poster_ID ?? x.Student__poster_ID ?? "",
+      department: x.student__department ?? x.Student__department ?? "",
       avg_score: x.avg_score ?? "",
       judge_count: x.judge_count ?? "",
     }));
   }
 
   return data.map((x) => ({
-    student: x.student ?? "",
-    poster_id: x.poster_id ?? "",
-    scored_by: `${x.scored ?? 0}/${x.total ?? 0}`,
+     student: x.student ?? "",
+  poster_id: x.poster_id ?? "",
+  department: x.department ?? "",
+  status_color: x.status_color ?? "",
+  scored: x.scored ?? 0,
+  total: x.total ?? 0,
+  scored_by: `${x.scored ?? 0}/${x.total ?? 0}`,
   }));
 }, [data, view]);
 
   const columns = useMemo(() => {
     if (view === "judge") return ["judge_first_name", "judge_email", "posters_scored_count",  "poster_ids"];
-    if (view === "scores") return ["student_name", "poster_id", "avg_score", "judge_count"];
-    return ["student", "poster_id", "scored_by"];
+    if (view === "scores") return ["student_name", "poster_id","department", "avg_score", "judge_count"];
+    return ["student", "poster_id","department", "scored_by"];
   }, [view]);
 
   const tableRows = useMemo(() => {
@@ -1181,7 +1339,8 @@ const fetchAggregateData = useCallback(() => {
   </div>
 
   <div className="xl:col-span-3 h-full">
-    <ActionCard theme={theme} onClick={fetchAggregateData} />
+    {/* <ActionCard theme={theme} onClick={fetchAggregateData} /> */}
+    <ActionCard theme={theme} onClick={handleCalculateAggregate} />
   </div>
 
   <div className="xl:col-span-12">
@@ -1259,6 +1418,16 @@ const fetchAggregateData = useCallback(() => {
                           </button>
                         </th>
                         <th className="px-4 py-4 text-left" style={{ borderBottom: `1px solid ${theme.border}` }}>
+                        <button
+                          type="button"
+                          onClick={() => requestSort("department")}
+                          className="font-black focus:outline-none focus-visible:ring-4"
+                          style={{ color: theme.text, background: "transparent", border: "none", "--tw-ring-color": theme.ring }}
+                        >
+                          Department{sortArrow("department")}
+                        </button>
+                      </th>
+                        <th className="px-4 py-4 text-left" style={{ borderBottom: `1px solid ${theme.border}` }}>
                           <button
                             type="button"
                             onClick={() => requestSort("avg_score")}
@@ -1268,6 +1437,7 @@ const fetchAggregateData = useCallback(() => {
                             Average Score{sortArrow("avg_score")}
                           </button>
                         </th>
+                        
                         <th className="px-4 py-4 text-left" style={{ borderBottom: `1px solid ${theme.border}` }}>
                           <button
                             type="button"
@@ -1359,6 +1529,16 @@ const fetchAggregateData = useCallback(() => {
                           </button>
                         </th>
                         <th className="px-4 py-4 text-left" style={{ borderBottom: `1px solid ${theme.border}` }}>
+                        <button
+                          type="button"
+                          onClick={() => requestSort("department")}
+                          className="font-black focus:outline-none focus-visible:ring-4"
+                          style={{ color: theme.text, background: "transparent", border: "none", "--tw-ring-color": theme.ring }}
+                        >
+                          Department{sortArrow("department")}
+                        </button>
+                      </th>
+                        <th className="px-4 py-4 text-left" style={{ borderBottom: `1px solid ${theme.border}` }}>
                           <button
                             type="button"
                             onClick={() => requestSort("scored_by")}
@@ -1392,14 +1572,64 @@ const fetchAggregateData = useCallback(() => {
                   {tableRows.length > 0 ? (
                     tableRows.map((item, idx) => (
                       <tr key={idx}>
-                        {view === "scores" && (
-                          <>
-                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.student_name}</td>
-                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.poster_id}</td>
-                            <td className="px-4 py-4 font-black" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.avg_score}</td>
-                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.judge_count}</td>
-                          </>
-                        )}
+                        {view === "scores" && (() => {
+                          const scoreUi = getJudgeCountColors(theme, Number(item.judge_count || 0));
+                          return (
+                            <>
+                              <td
+                                className="px-4 py-4"
+                                style={{
+                                  color: theme.text,
+                                  borderBottom: `1px solid ${theme.border}`,
+                                  background: scoreUi.bg,
+                                  borderLeft: `4px solid ${scoreUi.border}`,
+                                }}
+                              >
+                                {item.student_name}
+                              </td>
+                              <td
+                                className="px-4 py-4"
+                                style={{
+                                  color: theme.text,
+                                  borderBottom: `1px solid ${theme.border}`,
+                                  background: scoreUi.bg,
+                                }}
+                              >
+                                {item.poster_id}
+                              </td>
+                              <td
+                                className="px-4 py-4"
+                                style={{
+                                  color: theme.text,
+                                  borderBottom: `1px solid ${theme.border}`,
+                                  background: scoreUi.bg,
+                                }}
+                              >
+                                {item.department || "—"}
+                              </td>
+                              <td
+                                className="px-4 py-4 font-black"
+                                style={{
+                                  color: theme.text,
+                                  borderBottom: `1px solid ${theme.border}`,
+                                  background: scoreUi.bg,
+                                }}
+                              >
+                                {item.avg_score}
+                              </td>
+                              <td
+                                className="px-4 py-4 font-black"
+                                style={{
+                                  color: scoreUi.text,
+                                  borderBottom: `1px solid ${theme.border}`,
+                                  background: scoreUi.bg,
+                                }}
+                              >
+                                {item.judge_count}
+                              </td>
+                            </>
+                          );
+                        })()}
 
                         {view === "judge" && (
                           <>
@@ -1411,13 +1641,54 @@ const fetchAggregateData = useCallback(() => {
                           </>
                         )}
 
-                        {view === "student" && (
-                          <>
-                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.student}</td>
-                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.poster_id}</td>
-                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.scored_by}</td>
-                          </>
-                        )}
+                        {view === "student" && (() => {
+                            const statusUi = getStudentStatusColors(theme, item.status_color);
+                            return (
+                              <>
+                                <td
+                                  className="px-4 py-4"
+                                  style={{
+                                    color: theme.text,
+                                    borderBottom: `1px solid ${theme.border}`,
+                                    background: statusUi.bg,
+                                    borderLeft: `4px solid ${statusUi.border}`,
+                                  }}
+                                >
+                                  {item.student}
+                                </td>
+                                <td
+                                  className="px-4 py-4"
+                                  style={{
+                                    color: theme.text,
+                                    borderBottom: `1px solid ${theme.border}`,
+                                    background: statusUi.bg,
+                                  }}
+                                >
+                                  {item.poster_id}
+                                </td>
+                                <td
+                                  className="px-4 py-4"
+                                  style={{
+                                    color: theme.text,
+                                    borderBottom: `1px solid ${theme.border}`,
+                                    background: statusUi.bg,
+                                  }}
+                                >
+                                  {item.department || "—"}
+                                </td>
+                                <td
+                                  className="px-4 py-4 font-black"
+                                  style={{
+                                    color: statusUi.text,
+                                    borderBottom: `1px solid ${theme.border}`,
+                                    background: statusUi.bg,
+                                  }}
+                                >
+                                  {item.scored_by}
+                                </td>
+                              </>
+                            );
+                          })()}
                       </tr>
                     ))
                   ) : (
