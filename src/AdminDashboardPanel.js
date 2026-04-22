@@ -434,24 +434,24 @@ function FilterInput({ value, onChange, placeholder, theme, ariaLabel, inputMode
 //     </select>
 //   );
 // }
- const getStudentStatusColors = (theme, statusColor) => {
+const getStudentStatusColors = (theme, statusColor) => {
   if (statusColor === "red") {
     return {
-      bg: theme.mode === "light" ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.16)",
-      border: theme.mode === "light" ? "#e57373" : "#ef4444",
+      bg: theme.mode === "light" ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.14)",
+      border: theme.mode === "light" ? "#e59aa0" : "#ef4444",
       text: theme.mode === "light" ? "#c2410c" : "#ff8a80",
     };
   }
   if (statusColor === "yellow") {
     return {
-      bg: theme.mode === "light" ? "rgba(255,189,0,0.12)" : "rgba(255,189,0,0.18)",
-      border: theme.mode === "light" ? "#d69a00" : "#ffbd00",
+      bg: theme.mode === "light" ? "rgba(255,189,0,0.10)" : "rgba(255,189,0,0.16)",
+      border: theme.mode === "light" ? "#d6a94a" : "#ffbd00",
       text: theme.mode === "light" ? "#9a6700" : "#ffd666",
     };
   }
   return {
-    bg: theme.mode === "light" ? "rgba(34,197,94,0.10)" : "rgba(34,197,94,0.16)",
-    border: theme.mode === "light" ? "#22a06b" : "#22c55e",
+    bg: theme.mode === "light" ? "rgba(34,197,94,0.08)" : "rgba(34,197,94,0.14)",
+    border: theme.mode === "light" ? "#6abf8a" : "#22c55e",
     text: theme.mode === "light" ? "#1f7a38" : "#8ce99a",
   };
 };
@@ -471,7 +471,7 @@ function MobileRowCard({ view, item, theme }) {
       style={{
         ...raised(theme, 20),
         padding: 16,
-        ...(view === "student"
+        ...(view === "student" || view === "scores"
           ? {
               background: statusUi.bg,
               border: `2px solid ${statusUi.border}`,
@@ -574,26 +574,27 @@ function MobileRowCard({ view, item, theme }) {
     </article>
   );
 }
+
 const getJudgeCountColors = (theme, judgeCount) => {
   if (judgeCount === 0) {
     return {
-      bg: theme.mode === "light" ? "rgba(239,68,68,0.10)" : "rgba(239,68,68,0.16)",
-      border: theme.mode === "light" ? "#e57373" : "#ef4444",
+      bg: theme.mode === "light" ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.14)",
+      border: theme.mode === "light" ? "#e59aa0" : "#ef4444",
       text: theme.mode === "light" ? "#c2410c" : "#ff8a80",
     };
   }
   if (judgeCount === 1 || judgeCount === 2) {
     return {
-      bg: theme.mode === "light" ? "rgba(255,189,0,0.12)" : "rgba(255,189,0,0.18)",
-      border: theme.mode === "light" ? "#d69a00" : "#ffbd00",
+      bg: theme.mode === "light" ? "rgba(255,189,0,0.10)" : "rgba(255,189,0,0.16)",
+      border: theme.mode === "light" ? "#d6a94a" : "#ffbd00",
       text: theme.mode === "light" ? "#9a6700" : "#ffd666",
     };
   }
   return {
-    bg: theme.mode === "light" ? "rgba(34,197,94,0.10)" : "rgba(34,197,94,0.16)",
-    border: theme.mode === "light" ? "#22a06b" : "#22c55e",
-    text: theme.mode === "light" ? "#1f7a38" : "#8ce99a",
-  };
+    bg: theme.mode === "light" ? "rgba(34,197,94,0.08)" : "rgba(34,197,94,0.14)",
+      border: theme.mode === "light" ? "#6abf8a" : "#22c55e",
+      text: theme.mode === "light" ? "#1f7a38" : "#8ce99a",
+    };
 };
 function AggregateTable({ students, theme }) {
   return (
@@ -658,61 +659,66 @@ function AggregateTable({ students, theme }) {
       <div className="grid grid-cols-1 gap-4 lg:hidden">
         {students.map((student, idx) => {
           const rowUi = getJudgeCountColors(theme, Number(student.judge_count || 0));
-          return (
-          <article key={idx} style={{ ...raised(theme, 20), padding: 16 }}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-lg font-black" style={{ color: theme.text }}>
-                  {student.name}
-                </div>
-                <div className="text-sm break-words" style={{ color: theme.muted }}>
-                  {student.title}
-                </div>
-              </div>
-              <div
-                className="shrink-0 rounded-full px-3 py-1 text-sm font-black"
-                style={{ ...raised(theme, 999), color: theme.text }}
-              >
-                {student.avg_score}
-              </div>
-            </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
-                  Poster ID
+          return (
+            <article
+              key={idx}
+              style={{
+                ...raised(theme, 20),
+                padding: 16,
+                background: rowUi.bg,
+                border: `2px solid ${rowUi.border}`,
+              }}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-lg font-black" style={{ color: theme.text }}>
+                    {student.name}
+                  </div>
+                  <div className="text-sm break-words" style={{ color: theme.muted }}>
+                    {student.title}
+                  </div>
                 </div>
-                <div style={{ color: theme.text }}>{student.poster_id}</div>
+                <div
+                  className="shrink-0 rounded-full px-3 py-1 text-sm font-black"
+                  style={{ ...raised(theme, 999), color: theme.text }}
+                >
+                  {student.avg_score}
+                </div>
               </div>
-              {/* <div>
-                <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
-                  Category
+
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+                    Poster ID
+                  </div>
+                  <div style={{ color: theme.text }}>{student.poster_id}</div>
                 </div>
-                <div style={{ color: theme.text }}>
-                  {student.poster_id >= 101 && student.poster_id <= 199 ? "UG" : "Grad"}
+
+                <div>
+                  <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+                    Judge Count
+                  </div>
+                  <div style={{ color: rowUi.text, fontWeight: 800 }}>{student.judge_count}</div>
                 </div>
-              </div> */}
-              <div>
-              <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
-                Judge Count
+
+                <div>
+                  <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+                    Department
+                  </div>
+                  <div style={{ color: theme.text }}>{student.department}</div>
+                </div>
+
+                <div>
+                  <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
+                    Advisor
+                  </div>
+                  <div style={{ color: theme.text }}>{student.advisor}</div>
+                </div>
               </div>
-              <div style={{ color: "#22c55e", fontWeight: 800 }}>{student.judge_count}</div>
-            </div>
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
-                  Department
-                </div>
-                <div style={{ color: theme.text }}>{student.department}</div>
-              </div>
-              <div>
-                <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
-                  Advisor
-                </div>
-                <div style={{ color: theme.text }}>{student.advisor}</div>
-              </div>
-            </div>
-          </article>
-        )})}
+            </article>
+          );
+        })}
       </div>
     </>
   );
