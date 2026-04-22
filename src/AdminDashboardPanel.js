@@ -107,6 +107,7 @@ const FILTER_PLACEHOLDERS = {
   poster_ids: "Filter by poster IDs",
   student: "Filter by student name",
   department: "Filter by department",
+  judge_last_name: "Filter by judge last name",
 };
 
 const normalizeFilterValue = (key, value) => {
@@ -123,7 +124,7 @@ const SORT_OPTIONS = {
     { value: "judge_count", label: "Judge Count" },
   ],
   judge: [
-    { value: "judge_first_name", label: "Judge Name" },
+    { value: "judge_last_name", label: "Judge Last Name" },
     { value: "judge_email", label: "Judge Email" },
     { value: "posters_scored_count", label: "Posters Scored" },
     { value: "poster_ids", label: "Poster IDs" },
@@ -516,7 +517,7 @@ function MobileRowCard({ view, item, theme }) {
       {view === "judge" && (
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2 text-lg font-black" style={{ color: theme.text }}>
-            {item.judge_first_name}
+            {item.judge_last_name}
           </div>
           <div className="col-span-2 break-all">
             <div className="text-[11px] font-black uppercase tracking-wide" style={{ color: theme.muted }}>
@@ -1000,7 +1001,7 @@ const handleCalculateAggregate = useCallback(async () => {
   const rows = useMemo(() => {
   if (view === "judge") {
     return data.map((x) => ({
-      judge_first_name: x.judge_first_name ?? "",
+      judge_last_name: x.judge_last_name ?? x.judge_first_name ?? "",
       judge_email: x.judge_email ?? "",
       posters_scored_count:
         x.posters_scored_count ?? (Array.isArray(x.posters_scored) ? x.posters_scored.length : 0),
@@ -1042,7 +1043,7 @@ const handleCalculateAggregate = useCallback(async () => {
 }, [data, view]);
 
   const columns = useMemo(() => {
-    if (view === "judge") return ["judge_first_name", "judge_email", "posters_scored_count",  "poster_ids"];
+    if (view === "judge") return ["judge_last_name", "judge_email", "posters_scored_count",  "poster_ids"];
     if (view === "scores") return ["student_name", "poster_id","department", "avg_score", "judge_count"];
     return ["student", "poster_id","department", "scored_by"];
   }, [view]);
@@ -1462,11 +1463,11 @@ const handleCalculateAggregate = useCallback(async () => {
                         <th className="px-4 py-4 text-left" style={{ borderBottom: `1px solid ${theme.border}` }}>
                           <button
                             type="button"
-                            onClick={() => requestSort("judge_first_name")}
+                            onClick={() => requestSort("judge_last_name")}
                             className="font-black focus:outline-none focus-visible:ring-4"
                             style={{ color: theme.text, background: "transparent", border: "none", "--tw-ring-color": theme.ring }}
                           >
-                            Judge First Name{sortArrow("judge_first_name")}
+                            Judge Last Name{sortArrow("judge_last_name")}
                           </button>
                         </th>
                         <th className="px-4 py-4 text-left" style={{ borderBottom: `1px solid ${theme.border}` }}>
@@ -1639,7 +1640,7 @@ const handleCalculateAggregate = useCallback(async () => {
 
                         {view === "judge" && (
                           <>
-                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.judge_first_name}</td>
+                            <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.judge_last_name}</td>
                             <td className="px-4 py-4 break-all" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.judge_email}</td>
                             <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.posters_scored_count}</td>
                             {/* <td className="px-4 py-4" style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>{item.total_posters}</td> */}
@@ -1750,7 +1751,7 @@ const handleCalculateAggregate = useCallback(async () => {
     className="text-center text-sm sm:text-base font-black tracking-wide"
     style={{ color: theme.muted }}
   >
-    UWM RPC Dashboard
+    UWM RPC Dashboard 2026
   </div>
 </footer>
       </div>
