@@ -23,7 +23,7 @@ function StudentJudgedCount(props) {
 
     useEffect(() => {
         fetchData()
-        const interval = setInterval(() => fetchData(), 10000); // Fetch data every 10 seconds
+        const interval = setInterval(() => fetchData(), 30000); // Fetch data every 30 seconds
 
         return () => clearInterval(interval); // Clear interval on component unmount
     }, []);

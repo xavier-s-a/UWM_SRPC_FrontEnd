@@ -731,8 +731,8 @@ export default function AdminDashboardPanel() {
   const [data, setData] = useState([]);
   const [aggregateDataUG, setAggregateDataUG] = useState([]);
   const [aggregateDataGrad, setAggregateDataGrad] = useState([]);
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshMs, setRefreshMs] = useState(5000);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [refreshMs, setRefreshMs] = useState(120000);
   const [filters, setFilters] = useState({});
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [canAccessDashboard, setCanAccessDashboard] = useState(null);
@@ -1317,18 +1317,18 @@ const handleCalculateAggregate = useCallback(async () => {
           minHeight: 58,
         }}
       >
-        <option style={{ color: "#111111" }} value={2000}>
-          2 seconds
+        <option style={{ color: "#111111" }} value={30000}>
+          30 seconds
         </option>
-        <option style={{ color: "#111111" }} value={5000}>
-          5 seconds
+        <option style={{ color: "#111111" }} value={60000}>
+          1 minute
         </option>
-        <option style={{ color: "#111111" }} value={10000}>
-          10 seconds
+        <option style={{ color: "#111111" }} value={120000}>
+          2 minutes
         </option>
-        <option style={{ color: "#111111" }} value={20000}>
+        {/* <option style={{ color: "#111111" }} value={20000}>
           20 seconds
-        </option>
+        </option> */}
       </select>
     </ControlCard>
   </div>
